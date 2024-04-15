@@ -3,3 +3,5 @@
 .settings/*
 .DS_Store
 **/.DS_Store
+bin/Tests.class
+src/Tests.java
