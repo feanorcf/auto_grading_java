@@ -3,17 +3,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-public class CalculatorTest {
+public class JUnitTests {
 	
-	// to run in console
-	// !!! junit-platform-console-standalone-1.10.2.jar file must be in your "project_name"/lib folder !!!
-	// !!! your terminal must be on "project_name" folder !!!
+	// you can change it according to your own but do NOT delete!
+	public static final int MAX_POINTS = 100;
 	
-	// $ java -jar lib/junit-platform-console-standalone-1.10.2.jar execute -cp bin/ -c CalculatorTest
-	
-	// compile java code(not required in this case)
-	// $ javac -d bin -sourcepath src -cp .:lib/junit-platform-console-standalone-1.10.2.jar src/CalculatorTest.java
-	
+	// Methods which are already in here, are tests for a simple calculator program.
+	// When you implemented your own program which will be tested, adjust this tests according your program.
 	
 	// add tests(4)
 	@Test
@@ -22,7 +18,7 @@ public class CalculatorTest {
 		int expected = 0;
 		
 		// define actual value
-		int actual = Calculator.add(0, 0);
+		int actual = SampleProgram.add(0, 0);
 		
 		// if both values are equal, test will be correct
 		assertEquals(expected, actual);
@@ -31,21 +27,21 @@ public class CalculatorTest {
 	@Test
 	void adding_test_5_3() {
 		int expected = 8;
-		int actual = Calculator.add(5, 3);
+		int actual = SampleProgram.add(5, 3);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void adding_test_89_12() {
 		int expected = 101;
-		int actual = Calculator.add(89, 12);
+		int actual = SampleProgram.add(89, 12);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void adding_test_false_100_650() {
 		int not_expected = 10;
-		int actual = Calculator.add(100, 650);
+		int actual = SampleProgram.add(100, 650);
 		
 		// if both values are not equal, test will be correct
 		assertNotEquals(not_expected, actual);
@@ -54,7 +50,7 @@ public class CalculatorTest {
 	@Test
 	void adding_test_false_15_15() {
 		int not_expected = 35;
-		int actual = Calculator.add(15, 15);
+		int actual = SampleProgram.add(15, 15);
 		assertNotEquals(not_expected, actual);
 	}
 	
@@ -62,21 +58,21 @@ public class CalculatorTest {
 	@Test
 	void divide_test_120_2() {
 		double expected = 60;
-		double actual = Calculator.divide(120, 2);
+		double actual = SampleProgram.divide(120, 2);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void divide_test_25_5() {
 		double expected = 5;
-		double actual = Calculator.divide(25, 5);
+		double actual = SampleProgram.divide(25, 5);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void divide_test_false_50_5() {
 		double not_expected = 25;
-		double actual = Calculator.divide(50, 5);
+		double actual = SampleProgram.divide(50, 5);
 		assertNotEquals(not_expected, actual);
 	}
 	
@@ -87,12 +83,9 @@ public class CalculatorTest {
 		Class<ArithmeticException> expected_exception = ArithmeticException.class;
 		
 		// define Executable function(lambda)
-		Executable function = () -> { Calculator.divide(5, 0); } ;
+		Executable function = () -> { SampleProgram.divide(5, 0); } ;
 		
 		// if actual function trows expected excepition, test will be correct 
-		assertThrows(expected_exception, function);
-		
-	}
-	
+		assertThrows(expected_exception, function);	
+	}	
 }
-

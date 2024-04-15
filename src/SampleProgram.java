@@ -1,4 +1,4 @@
-public class Calculator {
+public class SampleProgram {
 	
 	public static int add(int a, int b) {
 		return a + b;
@@ -8,7 +8,6 @@ public class Calculator {
 		if(b == 0) {
 			throw new ArithmeticException("can not divide by 0");
 		}
-		
-		else return a / b;
+		return a / b;
 	}
 }

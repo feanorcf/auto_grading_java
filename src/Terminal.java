@@ -24,16 +24,16 @@ public class Terminal {
 			builder.command("sh", "-c", command);
 		}
 		
-		// start method returns us process object includes our data
+		// start method returns a process object includes our data
 		Process process = builder.start();
 			
-		//  get process streams
+		// get process streams
 		OutputStream output = process.getOutputStream();
 		InputStream input = process.getInputStream();
 		
 		String responses = getStream(input);
 		
-		// if process running time > 30 seconds this will return false
+		// if process running time > 30 seconds this variable will be false
 		boolean isFinished = process.waitFor(30, TimeUnit.SECONDS);
 		
 		// closing stream
@@ -48,18 +48,16 @@ public class Terminal {
 		return responses;
 	}
 	
-	
+	// read streams data
 	private static String getStream(InputStream input) throws IOException {
-		// read output data
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
-			String outputs = "";
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input)) ;
+		String outputs = "";		
+		String line;
 			
-			String line;
-			while((line = reader.readLine()) != null) {
-				// System.out.println(line);
-				outputs += line + "\n";
-			}
-			return outputs;
+		while((line = reader.readLine()) != null) {
+			outputs += line + "\n";
 		}
+		
+		return outputs;
 	}
 }
