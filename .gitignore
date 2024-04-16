@@ -5,3 +5,5 @@
 **/.DS_Store
 bin/Tests.class
 src/Tests.java
+src/__MACOSX/
+homeworks/*

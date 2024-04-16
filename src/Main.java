@@ -1,15 +1,45 @@
 import java.io.File;
+import java.io.IOException;
 
 public class Main {
-	public static void main(String[] args) {
-		int[] answers = getTestResults();
-		
-		int num_of_questions = answers[0] + answers[1];
-		int correct_answers = answers[0];
-		
-		int result = (int)Math.round(calculatePoints(JUnitTests.MAX_POINTS, num_of_questions, correct_answers));
-		
-		System.out.println("Result: " + result + "/" + JUnitTests.MAX_POINTS);
+	public static void main(String[] args) throws Exception{
+		File homeworksFolder = new File("homeworks");
+		File sourceFolder = new File("src");
+		File[] homeworkFiles = homeworksFolder.listFiles();
+		for (File file : homeworkFiles) {
+			if(!file.getName().endsWith(".zip")) {
+				continue;
+			}
+			int result;
+			String studentID = file.getName().replace(".zip", "");
+			System.out.println(studentID);
+			
+
+			try {
+				FileHelper.unzipFile(file.getAbsolutePath(), sourceFolder);
+			} catch (IOException e) {
+				System.out.println("zip file is empty or broken. std: " + studentID);
+				result = 0;
+				continue;
+			}
+			
+			Terminal.run(sourceFolder, "javac -d bin src/Homework.java");
+			
+			int[] grades = getTestResults();
+			if(grades == null) {
+				System.out.println("Homework class has errors. std: " + studentID);
+				result = 0;
+				continue;
+			}
+			
+			result = (int)calculatePoints(JUnitTests.MAX_POINTS, grades[0] + grades[1], grades[0]);
+			
+			System.out.println("StudentID: " + studentID + " Result: " + result);
+			
+			new File("src/Homework.java").delete();
+			new File("bin/Homework.class").delete();
+			
+		}
 	}
 	
 	// returns an integer array which includes successfull answers(0) and failed answers(1) count
