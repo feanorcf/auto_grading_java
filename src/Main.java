@@ -6,7 +6,7 @@ public class Main {
 		File homeworksFolder = new File("homeworks");
 		File sourceFolder = new File("src");
 		File[] homeworkFiles = homeworksFolder.listFiles();
-		String[] filesNeed = { "Homework.java", "__MACOSX/._Homework.java" };
+		String[] filesNeed = { "Homework.java" };
 		
 		for (File file : homeworkFiles) {
 			if(!file.getName().endsWith(".zip")) {

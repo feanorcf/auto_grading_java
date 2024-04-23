@@ -19,7 +19,7 @@ public class FileHelper {
 		
 
 		while (zipEntry != null) {
-			if (!isInArray(zipEntry.getName(), filesToExtract)) {
+			if (!isInFolder(zipEntry.getName(), filesToExtract)) {
 				zipEntry = getNext(zis);
 				continue;
 			}
@@ -105,9 +105,9 @@ public class FileHelper {
 		return null;
 	}
 
-	private static boolean isInArray(String element, String[] array) {
+	private static boolean isInFolder(String element, String[] array) {
 		for (String data : array) {
-			if (data.equals(element)) {
+			if(data.endsWith(element)) {
 				return true;
 			}
 		}
