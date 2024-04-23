@@ -1,3 +1,5 @@
+# Usage
+
 on main folder,
 ```
 java -cp bin: Main
