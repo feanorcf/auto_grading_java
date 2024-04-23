@@ -6,6 +6,8 @@ public class Main {
 		File homeworksFolder = new File("homeworks");
 		File sourceFolder = new File("src");
 		File[] homeworkFiles = homeworksFolder.listFiles();
+		String[] filesNeed = { "Homework.java", "__MACOSX/._Homework.java" };
+		
 		for (File file : homeworkFiles) {
 			if(!file.getName().endsWith(".zip")) {
 				continue;
@@ -16,10 +18,10 @@ public class Main {
 			
 
 			try {
-				FileHelper.unzipFile(file.getAbsolutePath(), sourceFolder);
+				FileHelper.unzipFile(file.getAbsolutePath(), sourceFolder, filesNeed);
 			} catch (IOException e) {
-				System.out.println("zip file is empty or broken. std: " + studentID);
 				result = 0;
+				System.out.println("File is broken. std: " + studentID + " Result: " + result);
 				continue;
 			}
 			
@@ -27,7 +29,7 @@ public class Main {
 			
 			int[] grades = getTestResults();
 			if(grades == null) {
-				System.out.println("Homework class has errors. std: " + studentID);
+				System.out.println("JUnit test file is broken.");
 				result = 0;
 				continue;
 			}

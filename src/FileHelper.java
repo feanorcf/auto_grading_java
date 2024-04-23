@@ -1,27 +1,37 @@
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class FileHelper {
-	public static void unzipFile(String zipFilePath, File newDestinationFolder) throws IOException {
+	public static void unzipFile(String zipFilePath, File newDestinationFolder, String[] filesToExtract)
+			throws IOException {
 		byte[] buffer = new byte[1024];
 
 		ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath));
 
-		ZipEntry zipEntry = zis.getNextEntry();
+		ZipEntry zipEntry = getNext(zis);
+		
+
 		while (zipEntry != null) {
+			if (!isInArray(zipEntry.getName(), filesToExtract)) {
+				zipEntry = getNext(zis);
+				continue;
+			}
+			
 			File newFile = createNewFile(newDestinationFolder, zipEntry);
+			
 			if (zipEntry.isDirectory()) {
 				if (!newFile.isDirectory() && !newFile.mkdirs()) {
 					zis.close();
 					throw new IOException("Failed to create directory " + newFile);
 				}
-			} 
-			else {
+			} else {
 				// fix for Windows-created archives
 				File parent = newFile.getParentFile();
 				if (!parent.isDirectory() && !parent.mkdirs()) {
@@ -37,12 +47,27 @@ public class FileHelper {
 				}
 				fos.close();
 			}
-			
-			zipEntry = zis.getNextEntry();
+
+			zipEntry = getNext(zis);
+				
 		}
 
 		zis.closeEntry();
 		zis.close();
+	}
+	
+	private static ZipEntry getNext(ZipInputStream zis) {
+		ZipEntry zipEntry;
+		while(true) {
+			try {
+				zipEntry = zis.getNextEntry();
+				break;
+			}
+			catch(Exception e) {
+				continue;
+			}
+		}
+		return zipEntry;
 	}
 
 	private static File createNewFile(File destinationDir, ZipEntry zipEntry) throws IOException {
@@ -56,6 +81,37 @@ public class FileHelper {
 		}
 
 		return destFile;
+	}
+
+	public static String zipFile(String sourceFile, String outputName) throws IOException {
+		FileOutputStream fos = new FileOutputStream(outputName + ".zip");
+		ZipOutputStream zipOut = new ZipOutputStream(fos);
+
+		File fileToZip = new File(sourceFile);
+		FileInputStream fis = new FileInputStream(fileToZip);
+		ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+		zipOut.putNextEntry(zipEntry);
+
+		byte[] bytes = new byte[1024];
+		int length;
+		while ((length = fis.read(bytes)) >= 0) {
+			zipOut.write(bytes, 0, length);
+		}
+
+		zipOut.close();
+		fis.close();
+		fos.close();
+
+		return null;
+	}
+
+	private static boolean isInArray(String element, String[] array) {
+		for (String data : array) {
+			if (data.equals(element)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
