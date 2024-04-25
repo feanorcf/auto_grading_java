@@ -1,11 +1,16 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
 		File sourceFolder = new File("src");
 		String[] filesNeed = { "Homework.java" };
 
-		Terminal.run(new File("."), "/usr/local/bin/python3 lib/unzipper.py");
+		String output = Terminal.run(new File("."), "python3 lib/unzipper.py");
+		
+		if(output.endsWith("BROKEN_FILE_EXCEPTION\n")) {
+			throw new FileNotFoundException("Zip file cannot found or file is broken.");
+		}
 
 		File[] outputs = new File("homeworks/outputs").listFiles();
 
@@ -20,13 +25,13 @@ public class Main {
 
 			for (File studentFile : studentFiles) {
 				if (studentFile.getName().equals(filesNeed[0])) {
-					studentFile.renameTo(new File("src/Homework.java"));
+					studentFile.renameTo(new File("junit_test_folder/Homework.java"));
 					System.out.println(file.getName());
 					studentID = file.getName();
 				}
 			}
 			
-			Terminal.run(sourceFolder, "javac -d bin src/Homework.java");
+			Terminal.run(sourceFolder, "javac junit_test_folder/Homework.java");
 			
 			int[] grades = getTestResults();
 			if(grades == null) {
@@ -34,12 +39,12 @@ public class Main {
 				continue;
 			}
 			
-			int result = (int)calculatePoints(JUnitTests.MAX_POINTS, grades[0] + grades[1], grades[0]);
+			int result = (int)calculatePoints(100, grades[0] + grades[1], grades[0]);
 			
 			System.out.println("StudentID: " + studentID + " Result: " + result);
 			
-			new File("src/Homework.java").delete();
-			new File("bin/Homework.class").delete();
+			new File("junit_test_folder/Homework.java").delete();
+			new File("junit_test_folder/Homework.class").delete();
 			
 		}
 		deleteDirectory(new File("homeworks/outputs/"));
@@ -61,13 +66,13 @@ public class Main {
 		File location = new File(".");
 
 		String compile_command = "";
-		String run_command = "java -jar lib/junit-platform-console-standalone-1.10.2.jar execute -cp bin/ -c JUnitTests";
+		String run_command = "java -jar lib/junit-platform-console-standalone-1.10.2.jar execute -cp junit_test_folder/ -c JUnitTests";
 
 		// use ";" instead of ":" on windows
 		if (Terminal.IS_WINDOWS) {
-			compile_command = "javac -d bin -sourcepath src -cp .;lib/junit-platform-console-standalone-1.10.2.jar src/JUnitTests.java";
+			compile_command = "javac -d junit_test_folder -sourcepath junit_test_folder -cp .;lib/junit-platform-console-standalone-1.10.2.jar junit_test_folder/JUnitTests.java";
 		} else {
-			compile_command = "javac -d bin -sourcepath src -cp .:lib/junit-platform-console-standalone-1.10.2.jar src/JUnitTests.java";
+			compile_command = "javac -d junit_test_folder -sourcepath junit_test_folder -cp .:lib/junit-platform-console-standalone-1.10.2.jar junit_test_folder/JUnitTests.java";
 		}
 
 		try {
