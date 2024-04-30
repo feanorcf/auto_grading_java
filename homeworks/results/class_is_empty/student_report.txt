@@ -1,0 +1,3 @@
+Report: class_is_empty
+result is 0
+report is finished.

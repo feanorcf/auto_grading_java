@@ -1,0 +1,3 @@
+Report: has_errors
+result is 0
+report is finished.

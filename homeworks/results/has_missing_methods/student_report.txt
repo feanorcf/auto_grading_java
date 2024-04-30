@@ -1,0 +1,3 @@
+Report: has_missing_methods
+result is 77
+report is finished.

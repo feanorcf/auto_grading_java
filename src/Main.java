@@ -6,7 +6,7 @@ public class Main {
 		File sourceFolder = new File("src");
 		String[] filesNeed = { "Homework.java" };
 
-		String output = Terminal.run(new File("."), "python3 lib/unzipper.py");
+		String output = Terminal.run(new File("."), "python3 lib/zip_helper.py 0");
 		
 		if(output.endsWith("BROKEN_FILE_EXCEPTION\n")) {
 			throw new FileNotFoundException("Zip file cannot found or file is broken.");
@@ -15,38 +15,100 @@ public class Main {
 		File[] outputs = new File("homeworks/outputs").listFiles();
 
 		for (File file : outputs) {
-			if (file.getName().endsWith("__MACOSX") || file.isFile()) {
+			// for remove unwanted folders
+			if (file.getName().endsWith("__MACOSX") || file.getName().endsWith(".DS_Store")) {
+				deleteDirectory(file);
 				continue;
 			}
-
-			String studentID = "";
-			
 			File[] studentFiles = file.listFiles();
-
-			for (File studentFile : studentFiles) {
-				if (studentFile.getName().equals(filesNeed[0])) {
-					studentFile.renameTo(new File("junit_test_folder/Homework.java"));
-					System.out.println(file.getName());
-					studentID = file.getName();
+			
+			System.out.println(file.getName());
+			
+			// for initialize student report
+			String studentId = file.getName();
+			
+			File reportFile = new File("./junit_test_folder/student_report.txt");
+			reportFile.createNewFile();
+			
+			Report report = new Report(studentId, reportFile);
+			
+			// try that student has correct files.
+			try {
+				int fileCount = 0;
+				
+				main:
+				for (String fileNeed : filesNeed) {
+					for(File studentFile : studentFiles) {
+						if (studentFile.getName().equals(fileNeed)) {
+							studentFile.renameTo(new File("junit_test_folder/" + fileNeed));
+							fileCount += 1;
+							continue main;
+						}
+					}
+				}
+				if(fileCount != filesNeed.length) {
+					throw new Exception();
 				}
 			}
-			
-			Terminal.run(sourceFolder, "javac junit_test_folder/Homework.java");
-			
-			int[] grades = getTestResults();
-			if(grades == null) {
-				System.out.println("JUnit test file is broken.");
+			// if there are wrong files write this to the report
+			catch(Exception e) {
+				report.setGrade(0);
+				report.addLine("Homework files can not found. So grade is " + report.getGrade());
+				report.flushReport();
+				
+				// delete student files and move report file to student folder
+				for(File studentFile : studentFiles) {
+					studentFile.delete();
+				}
+				reportFile.renameTo(new File(file.getPath() + "/student_report.txt"));
 				continue;
 			}
 			
+			// compile all the files we need
+			for(String fileName : filesNeed) {
+				Terminal.run(sourceFolder, "javac junit_test_folder/" + fileName);				
+			}
+			
+			// run tests and get results
+			int[] grades = getTestResults();
+			if(grades == null) {
+				new File("junit_test_folder/Homework.java").delete();
+				new File("junit_test_folder/Homework.class").delete();
+				reportFile.delete();
+				System.out.println("JUnit test file is broken. Try with different JUnit file.");
+				break;
+			}
+			
+			// for calculation and add results to student report
 			int result = (int)calculatePoints(100, grades[0] + grades[1], grades[0]);
+			report.setGrade(result);
+			report.addLine("result is " + result);
+			report.addLine("report is finished.");
+			report.flushReport();
 			
-			System.out.println("StudentID: " + studentID + " Result: " + result);
+			// delete student files and move report file to student folder
+			for(File studentFile : studentFiles) {
+				studentFile.delete();
+			}
+			reportFile.renameTo(new File(file.getPath() + "/student_report.txt"));
 			
-			new File("junit_test_folder/Homework.java").delete();
-			new File("junit_test_folder/Homework.class").delete();
+			// delete student files on main directory
+			for(String fileName : filesNeed) {
+				new File("junit_test_folder/" + fileName).delete();
+				fileName = fileName.replace(".java", ".class");
+				new File("junit_test_folder/" + fileName).delete();							
+			}
 			
 		}
+		
+		// compress output folder
+		String zip_output = Terminal.run(new File("."), "python3 lib/zip_helper.py 1");
+		
+		if(zip_output.endsWith("BROKEN_FILE_EXCEPTION\n")) {
+			deleteDirectory(new File("homeworks/outputs/"));
+			throw new FileNotFoundException("Zip file already exist. Delete results.zip and try again");
+		}
+
 		deleteDirectory(new File("homeworks/outputs/"));
 	}
 	
@@ -60,8 +122,7 @@ public class Main {
 	    return directoryToBeDeleted.delete();
 	}
 
-	// returns an integer array which includes successfull answers(0) and failed
-	// answers(1) count
+	// returns an integer array which includes successfull answers(0) and failed answers(1) count
 	private static int[] getTestResults() {
 		File location = new File(".");
 

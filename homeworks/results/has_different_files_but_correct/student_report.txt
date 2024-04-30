@@ -1,0 +1,3 @@
+Report: has_different_files_but_correct
+result is 100
+report is finished.

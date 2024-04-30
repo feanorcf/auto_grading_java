@@ -1,0 +1,3 @@
+Report: full_correct
+result is 100
+report is finished.
